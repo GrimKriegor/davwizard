@@ -293,6 +293,35 @@ function setCalendarColorDialog() {
   setCalendarColor "$account_name" "$calendar_name" "$color_name"
 }
 
+function installConfig() {
+  location="$1"
+  [ -d "$HOME/.config/$location" ] && \
+    mv "$HOME/.config/$location" "$HOME/.config/$location.bkp"
+  ln -sf "$davwizard_dir/autoconf/$location" "$HOME/.config/$location"
+}
+
+function installConfigsDialog() {
+  config_list=( "khal" "khard" "todoman" )
+  config_list_checklist=$(formatChecklist ${config_list[@]})
+  echo $config_list_checklist
+  chosen=($(dialog \
+    --separate-output \
+    --no-tags \
+    --checklist "Select all desired programs with <SPACE>." \
+    15 40 16 \
+    ${config_list_checklist[@]} \
+    2>&1 >/dev/tty \
+  ))
+  for config in "${chosen[@]}"; do
+    installConfig "$config"
+    dialog \
+      --title "$default_title -- Configuration" \
+      --msgbox "Config for $config added" \
+      6 60 \
+      3>&1 1>&2 2>&3 3>&-
+  done
+}
+
 function advancedOptions() {
   choice=$(dialog \
     --title "$default_title - Advanced options" --nocancel \
@@ -309,22 +338,24 @@ trap "exitWizard" 0 1 2 3 15
 while true; do
   choice=$(dialog \
     --title "$default_title" --nocancel \
-    --menu "What would you like to do?" 15 45 7 \
+    --menu "What would you like to do?" 15 45 8 \
       0 "List all accounts configured." \
       1 "Add an account." \
-      2 "Enable/disable autosync." \
-      3 "Change an account's password." \
-      4 "Remove an account." \
-      5 "Advanced options." \
+      2 "Install program configs." \
+      3 "Enable/disable autosync." \
+      4 "Change an account's password." \
+      5 "Remove an account." \
+      6 "Advanced options." \
       9 "Exit this wizard." \
     3>&1 1>&2 2>&3 3>&1 )
   case $choice in
     0) listAccountsDialog ;;
     1) addAccountDialog ;;
-    2) configureAutosyncDialog ;;
-    3) changeAccountPasswordDialog ;;
-    4) removeAccountDialog ;;
-    5) advancedOptions ;;
+    2) installConfigsDialog ;;
+    3) configureAutosyncDialog ;;
+    4) changeAccountPasswordDialog ;;
+    5) removeAccountDialog ;;
+    6) advancedOptions ;;
     9) exitWizard ;;
     *) echo "Unable to read response from dialog. Exiting." >&2; exit 2
   esac
