@@ -1,0 +1,32 @@
+[general]
+status_path = "~/.vdirsyncer/$account/"
+
+[pair $account_calendars]
+a = "$account_calendars_local"
+b = "$account_calendars_remote"
+collections = ["from a", "from b"]
+conflict_resolution = "b wins"
+[storage $account_calendars_local]
+type = "filesystem"
+fileext = ".ics"
+path = "~/.calendars/$account/"
+[storage $account_calendars_remote]
+type = "caldav"
+url = "$url"
+username = "$username"
+password.fetch = ["command", "~/.config/davwizard/getpass.sh", "$account"]
+
+[pair $account_contacts]
+a = "$account_contacts_local"
+b = "$account_contacts_remote"
+collections = ["from a", "from b"]
+conflict_resolution = "b wins"
+[storage $account_contacts_local]
+type = "filesystem"
+fileext = ".vcf"
+path = "~/.contacts/$account/"
+[storage $account_contacts_remote]
+type = "carddav"
+url = "$url"
+username = "$username"
+password.fetch = ["command", "~/.config/davwizard/getpass.sh", "$account"]

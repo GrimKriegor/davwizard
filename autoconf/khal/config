@@ -1,0 +1,21 @@
+[default]
+highlight_event_days = true
+show_all_days = false
+timedelta = 30d
+
+[locale]
+timeformat = %H:%M
+dateformat = %Y-%m-%d
+longdateformat = %Y-%m-%d
+datetimeformat = %Y-%m-%d %H:%M
+longdatetimeformat = %Y-%m-%d %H:%M
+weeknumbers = left
+
+[highlight_days]
+method = foreground
+
+[calendars]
+[[discovery]]
+path = ~/.calendars/*/*
+type = discover
+color = dark green
