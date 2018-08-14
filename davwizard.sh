@@ -116,6 +116,27 @@ function createAccountVdirsyncerConfig() {
   cat $davwizard_dir/autoconf/vdirsyncer/config | sed -e "$replacement" >> "$vdirsyncer_config"
 }
 
+function regenerateAccountConfigsDialog() {
+  account_list=($(listAccountsChecklist))
+  chosen=($(dialog \
+    --separate-output \
+    --no-tags \
+    --title "$default_title -- Account regeneration" \
+    --checklist "Select all desired accounts with <SPACE>." \
+    15 40 16 \
+    "${account_list[@]}" \
+    2>&1 >/dev/tty \
+  ))
+  for account in "${chosen[@]}"; do
+    createAccountVdirsyncerConfig "$account"
+    dialog \
+      --title "$default_title -- Account regeneration" \
+      --msgbox "Account $account regenerated" \
+      6 60 \
+      3>&1 1>&2 2>&3 3>&-
+  done
+}
+
 function addAccountDialog() {
   title="$default_title -- Account creation"
   account_name="$(dialog \
@@ -326,11 +347,14 @@ function advancedOptions() {
   choice=$(dialog \
     --title "$default_title - Advanced options" --nocancel \
     --menu "What would you like to do?" 15 45 7 \
-      0 "Change calendar color" \
+      0 "Change calendar color." \
+      1 "Regenerate account configs." \
+      9 "Go back." \
     3>&1 1>&2 2>&3 3>&1 )
   case $choice in
     0) setCalendarColorDialog ;;
-    9) exitWizard ;;
+    1) regenerateAccountConfigsDialog ;;
+    9) echo ;;
   esac
 }
 
