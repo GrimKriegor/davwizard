@@ -198,7 +198,6 @@ function removeAccount() {
   account_name="$1"
   rm -rf "$davwizard_dir/accounts/$account_name" | true
   rm -rf "$davwizard_dir/accounts/$account_name.d" | true
-  rm -rf "$davwizard_dir/credentials/$account_name.gpg" | true
   locations=( ".calendars" ".contacts" ".vdirsyncer" )
   for location in "${locations[@]}"; do
     [ -d "$HOME/$location/$account_name" ] && \
@@ -242,7 +241,7 @@ function encryptPassword() {
   echo "$account_password" > "/tmp/davwizard_$account_name"
   gpg2 -r "$account_encryption_key" --encrypt "/tmp/davwizard_$account_name"
   shred -u "/tmp/davwizard_$account_name"
-  mv "/tmp/davwizard_$account_name.gpg" "$davwizard_dir/credentials/$account_name.gpg"
+  mv "/tmp/davwizard_$account_name.gpg" "$davwizard_dir/accounts/$account_name.d/secret.gpg"
 }
 
 function changeAccountPasswordDialog() {
