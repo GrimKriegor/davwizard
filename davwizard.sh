@@ -4,7 +4,9 @@ set -e
 
 davwizard_dir="$HOME/.config/davwizard"
 default_title="davwizard"
-temporary_folder="/tmp/davwizard/"
+temporary_folder="/tmp/$USER/davwizard/"
+
+mkdir -p "$temporary_folder"
 
 function exitWizard() {
   clear
@@ -85,12 +87,12 @@ function createAccountConfig() {
 function getCerficate() {
   id="$1"
   url="$2"
-  openssl s_client -showcerts -connect "$url" < /dev/null > /tmp/"$id".pem 2> /dev/null
+  openssl s_client -showcerts -connect "$url" < /dev/null > $temporary_folder/"$id".pem 2> /dev/null
 }
 
 function getCertificateFingerprint() {
   id="$1"
-  echo $(openssl x509 -in /tmp/"$id".pem -noout -sha256 -fingerprint | awk -F "=" '{print $2}')
+  echo $(openssl x509 -in $temporary_folder/"$id".pem -noout -sha256 -fingerprint | awk -F "=" '{print $2}')
 }
 
 function vdirsyncerDiscovery() {
@@ -238,10 +240,10 @@ function encryptPassword() {
   account_name="$1"
   account_encryption_key="$2"
   account_password="$3"
-  echo "$account_password" > "/tmp/davwizard_$account_name"
-  gpg2 -r "$account_encryption_key" --encrypt "/tmp/davwizard_$account_name"
-  shred -u "/tmp/davwizard_$account_name"
-  mv "/tmp/davwizard_$account_name.gpg" "$davwizard_dir/accounts/$account_name.d/secret.gpg"
+  echo "$account_password" > "$temporary_folder/$account_name"
+  gpg2 -r "$account_encryption_key" --encrypt "$temporary_folder/$account_name"
+  shred -u "$temporary_folder/$account_name"
+  mv "$temporary_folder/$account_name.gpg" "$davwizard_dir/accounts/$account_name.d/secret.gpg"
 }
 
 function changeAccountPasswordDialog() {
